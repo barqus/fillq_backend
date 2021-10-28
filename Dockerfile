@@ -1,15 +1,15 @@
-FROM golang:1.16-alpine
+FROM golang:1.14.6-alpine3.12 as builder
 
-WORKDIR /app
+COPY go.mod go.sum /go/src/github.com/barqus/fillq_backend/
 
-COPY go.mod ./
-COPY go.sum ./
+WORKDIR /go/src/github.com/barqus/fillq_backend
 RUN go mod download
+COPY . /go/src/github.com/barqus/fillq_backend
 
-COPY *.go ./
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o build/fillq_backend github.com/barqus/fillq_backend
 
-RUN go build -o /docker-gs-ping
-
-EXPOSE 8080
-
-CMD [ "/docker-gs-ping" ]
+FROM alpine
+RUN apk add --no-cache ca-certificates && update-ca-certificates
+COPY --from=builder /go/src/github.com/barqus/fillq_backend/build/fillq_backend /usr/bin/barqus
+EXPOSE 8080 8080
+ENTRYPOINT ["/usr/bin/barqus","server"]

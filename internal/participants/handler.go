@@ -1,37 +1,51 @@
 package participants
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"log"
-	"math/rand"
+	"github.com/barqus/fillq_backend/internal/common_http"
 	"net/http"
 )
 
-func GetAllParticipants(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(ParticipantsMock)
+type HttpClient struct {
+	svc Service
 }
 
-func AddParticipant(w http.ResponseWriter, r *http.Request) {
-	// Read to request body
-	defer r.Body.Close()
-	body, err := ioutil.ReadAll(r.Body)
+func MustNewHttpClient(service Service) *HttpClient {
+	return &HttpClient{
+		svc: service,
+	}
+}
+
+func (c HttpClient) GetAllParticipants(w http.ResponseWriter, r *http.Request) {
+	allParticipants, err := c.svc.getAllParticipants()
 
 	if err != nil {
-		log.Fatalln(err)
+		return
 	}
 
-	var participant Participant
-	json.Unmarshal(body, &participant)
-
-	// Append to the Book mocks
-	participant.Id = rand.Intn(100)
-	ParticipantsMock = append(ParticipantsMock, participant)
-
-	// Send a 201 created response
-	w.WriteHeader(http.StatusCreated)
-	w.Header().Add("Content-Type", "application/json")
-	json.NewEncoder(w).Encode("Created")
+	common_http.WriteJSONResponse(w, http.StatusOK, allParticipants)
+	//w.Header().Add("Content-Type", "application/json")
+	//w.WriteHeader(http.StatusOK)
+	//json.NewEncoder(w).Encode(ParticipantsMock)
 }
+
+//func AddParticipant(w http.ResponseWriter, r *http.Request) {
+//	// Read to request body
+//	defer r.Body.Close()
+//	body, err := ioutil.ReadAll(r.Body)
+//
+//	if err != nil {
+//		log.Fatalln(err)
+//	}
+//
+//	var participant Participant
+//	json.Unmarshal(body, &participant)
+//
+//	// Append to the Book mocks
+//	participant.Id = rand.Intn(100)
+//	ParticipantsMock = append(ParticipantsMock, participant)
+//
+//	// Send a 201 created response
+//	w.WriteHeader(http.StatusCreated)
+//	w.Header().Add("Content-Type", "application/json")
+//	json.NewEncoder(w).Encode("Created")
+//}
