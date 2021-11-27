@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"os"
 )
 
 func HandleHTTP() {
@@ -30,6 +31,10 @@ func HandleHTTP() {
 	r.Route("/api/", func(r chi.Router) {
 		r.Route("/v1", api.HandlerAPIv1)
 	})
+	logrus.Info("START")
+	l.Info(os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("POSTGRES_DB"))
+	l.Info(os.Environ())
+	l.Info("TEST")
 	l.Info("SERVER STARTED...")
 	panic(http.ListenAndServe(":8080", r))
 

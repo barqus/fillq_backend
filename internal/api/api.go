@@ -11,13 +11,23 @@ import (
 	"github.com/barqus/fillq_backend/internal/users"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-chi/chi"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"os"
 )
 
 func HandlerAPIv1(router chi.Router) {
 	// TODO: READ ENV VARIABLES THROUGH .ENV FILE
-	databaseClient, _ := database.Initialize(os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("POSTGRES_DB"))
+
+	l := logrus.New()
+
+	l.SetFormatter(&logrus.JSONFormatter{})
+	databaseClient, err := database.Initialize(os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("POSTGRES_DB"))
+
+	if err != nil {
+		l.Info("TEST")
+		l.Info(err)
+	}
 	httpClient := common_http.NewClient(http.DefaultClient)
 
 	usersClient := users.MustNewHttpClient(users.MustNewService(httpClient, users.MustNewStorage(databaseClient)))

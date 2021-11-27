@@ -11,4 +11,7 @@ type Participant struct {
 	Nickname      string    `json:"nickname"`
 	SummonerName  string    `json:"summoner_name"`
 	TwitchChannel string    `json:"twitch_channel"`
+	Instagram string    `json:"instagram"`
+	Twitter string    `json:"twitter"`
+	Youtube string    `json:"youtube"`
 }

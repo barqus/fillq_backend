@@ -4,11 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
-	"log"
+	"github.com/sirupsen/logrus"
 )
 
 const (
-	HOST = "localhost"
+	HOST = "database_container"
 	PORT = 5432
 )
 
@@ -24,8 +24,23 @@ func Initialize(username, password, database string) (*Database, error) {
 	// export POSTGRESQL_URL="postgres://barqus:root@localhost:5432/fillq-db?sslmode=disable"
 	// migrate -database ${POSTGRESQL_URL} -path ./migrations upv
 	db := Database{}
-	dsn := fmt.Sprintf( "host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		HOST, PORT, username, password, database)
+	//dsn := fmt.Sprintf( "host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+	//	HOST, PORT, username, password, database)
+
+	dsn := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable",
+		username,
+		password,
+		HOST,
+		PORT,
+		database)
+
+
+	l := logrus.New()
+
+	l.SetFormatter(&logrus.JSONFormatter{})
+
+	l.Info(dsn)
+
 	conn, err := sql.Open("postgres", dsn)
 	if err != nil {
 		return &db, err
@@ -35,6 +50,6 @@ func Initialize(username, password, database string) (*Database, error) {
 	if err != nil {
 		return &db, err
 	}
-	log.Println("Database connection established")
+
 	return &db, nil
 }
