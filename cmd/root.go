@@ -32,4 +32,5 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&host, "host", "0.0.0.0", "webserver host")
 	rootCmd.PersistentFlags().StringVar(&port, "port", "8080", "webserver port")
 	rootCmd.AddCommand(serverCmd)
+	rootCmd.AddCommand(schedulerCmd)
 }

@@ -19,14 +19,46 @@ func (c HttpClient) GetAllParticipants(w http.ResponseWriter, r *http.Request) {
 	allParticipants, err := c.svc.getAllParticipants()
 
 	if err != nil {
+		common_http.WriteErrorResponse(w, err)
 		return
 	}
 
 	common_http.WriteJSONResponse(w, http.StatusOK, allParticipants)
-	//w.Header().Add("Content-Type", "application/json")
-	//w.WriteHeader(http.StatusOK)
-	//json.NewEncoder(w).Encode(ParticipantsMock)
 }
+
+func (c HttpClient) AddParticipant(w http.ResponseWriter, r *http.Request) {
+	var participantData *Participant
+
+	if err := common_http.ParseJSON(r, &participantData); err != nil {
+		common_http.WriteErrorResponse(w, err)
+		return
+	}
+
+	err := c.svc.addParticipants(participantData)
+	if err != nil {
+		common_http.WriteErrorResponse(w, err)
+		return
+	}
+
+	common_http.WriteJSONResponse(w, http.StatusOK, 200)
+}
+
+func (c HttpClient) DeleteParticipant(w http.ResponseWriter, r *http.Request) {
+	id, err := common_http.ParseURLParamToSInt(r, "id")
+	if err != nil {
+		common_http.WriteErrorResponse(w, err)
+		return
+	}
+
+	err = c.svc.deleteParticipant(id)
+	if err != nil {
+		common_http.WriteErrorResponse(w, err)
+		return
+	}
+
+	common_http.WriteJSONResponse(w, http.StatusOK, 200)
+}
+
 
 //func AddParticipant(w http.ResponseWriter, r *http.Request) {
 //	// Read to request body

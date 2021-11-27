@@ -20,8 +20,11 @@ type Database struct {
 }
 
 func Initialize(username, password, database string) (*Database, error) {
+	// TODO: CHECK WHAT VARIABLES ARE RUN WITH MIGRATION
+	// export POSTGRESQL_URL="postgres://barqus:root@localhost:5432/fillq-db?sslmode=disable"
+	// migrate -database ${POSTGRESQL_URL} -path ./migrations upv
 	db := Database{}
-	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+	dsn := fmt.Sprintf( "host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		HOST, PORT, username, password, database)
 	conn, err := sql.Open("postgres", dsn)
 	if err != nil {

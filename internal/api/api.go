@@ -1,33 +1,88 @@
 package api
 
 import (
+	"fmt"
+	"github.com/barqus/fillq_backend/internal/common_http"
 	"github.com/barqus/fillq_backend/internal/database"
+	"github.com/barqus/fillq_backend/internal/middleware"
 	"github.com/barqus/fillq_backend/internal/participants"
+	"github.com/barqus/fillq_backend/internal/pickems"
+	"github.com/barqus/fillq_backend/internal/questions"
+	"github.com/barqus/fillq_backend/internal/users"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/go-chi/chi"
+	"net/http"
+	"os"
 )
 
 func HandlerAPIv1(router chi.Router) {
-	//httpClient := common_http.NewClient(http.DefaultClient)
-	//dbUser, dbPassword, dbName :=
-	//os.Getenv("POSTGRES_USER"),
-	//os.Getenv("POSTGRES_PASSWORD"),
-	//os.Getenv("POSTGRES_DB")
+	// TODO: READ ENV VARIABLES THROUGH .ENV FILE
+	databaseClient, _ := database.Initialize(os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("POSTGRES_DB"))
+	httpClient := common_http.NewClient(http.DefaultClient)
 
-	databaseClient, _ := database.Initialize("barqus", "root", "fillq-db")
-	participantClient := participants.MustNewHttpClient(participants.MustNewService(participants.MustNewStorage(databaseClient)))
-	//database := database.Get
-	router.Route("/participants", func(r chi.Router) {
-		r.Get("/", participantClient.GetAllParticipants)
+	usersClient := users.MustNewHttpClient(users.MustNewService(httpClient, users.MustNewStorage(databaseClient)))
+	router.Route("/user", func(r chi.Router) {
+		r.Get("/login/{id}", usersClient.LoginUser)
+		r.Get("/{id}", usersClient.GetUserByID)
 	})
 
-	//router := mux.NewRouter()
-	//
-	//router.HandleFunc("/participants", participants.GetAllParticipants).Methods(http.MethodGet)
-	//router.HandleFunc("/participants", participants.AddParticipant).Methods(http.MethodPost)
-	//
-	//
-	//router.HandleFunc("/participants/{summoner_name}", leagueoflegends.GetParticipantsLeagueInformation).Methods(http.MethodGet)
-	//
-	//log.Println("API is running!")
-	//http.ListenAndServe(":4000", router)
+	participantsClient := participants.MustNewHttpClient(participants.MustNewService(participants.MustNewStorage(databaseClient)))
+	router.Route("/participants", func(r chi.Router) {
+		r.Get("/", participantsClient.GetAllParticipants)
+		//r.Get("/", participantsClient.GetAllParticipants)
+		r.With(adminMiddleware).Post("/", participantsClient.AddParticipant)
+		r.With(adminMiddleware).Delete("/{id}", participantsClient.DeleteParticipant)
+	})
+
+	pickemsClient := pickems.MustNewHttpClient(pickems.MustNewService(pickems.MustNewStorage(databaseClient)))
+	router.Route("/pickems", func(r chi.Router) {
+		r.Get("/{user_id}", pickemsClient.GetUsersPickems)
+		r.Post("/{user_id}", pickemsClient.CreateUsersPickems)
+		r.Delete(	"/{user_id}", pickemsClient.DeleteUsersAllPickems)
+	})
+
+	//summonersClient := leagueoflegends.MustNewHttpClient()
+	//router.Route("/summoners", func(r chi.Router) {
+	//	r.Get("/", summonersClient.GetLeagueInformation)
+	//})
+
+	qnaClient := questions.MustNewHttpClient(questions.MustNewService(questions.MustNewStorage(databaseClient)))
+	router.Route("/questions", func(r chi.Router) {
+		r.Get("/{participant_id}", qnaClient.GetParticipantsQNA)
+		r.With(adminMiddleware).Post("/", qnaClient.AddQNA)
+		r.With(adminMiddleware).Delete("/{id}", qnaClient.DeleteQNAByID)
+	})
+
+}
+
+func adminMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("HERE")
+		c, err := r.Cookie("jwt_token")
+		if err != nil {
+			if err == http.ErrNoCookie {
+				// If the cookie is not set, return an unauthorized status
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			// For any other type of error, return a bad request status
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		jwtTokenInformation, err := middleware.VerifyToken(c.Value)
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
+		jwtTokenMetadata := jwtTokenInformation.Claims.(jwt.MapClaims)
+
+		userIsAdmin := jwtTokenMetadata["admin"].(bool)
+		if userIsAdmin != true {
+			w.WriteHeader(http.StatusForbidden)
+			return
+		}
+
+		next.ServeHTTP(w,r)
+	})
 }
