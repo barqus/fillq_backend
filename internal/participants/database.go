@@ -54,7 +54,7 @@ func (pS participantStorage) GetAllParticipants() ([]*Participant, error) {
 }
 
 func (pS participantStorage) AddParticipant(participant *Participant) error {
-	query := `INSERT INTO participants (name, surname, birth_day, description, nickname, summoner_name, twitch_channel) VALUES ($1, $2, $3, $4, $5, $6, $7)`
+	query := `INSERT INTO participants (name, surname, birth_day, description, nickname, summoner_name, twitch_channel,instagram,twitter,youtube) VALUES ($1, $2, $3, $4, $5, $6, $7,$8,$9,$10)`
 	_, err := pS.db.Conn.Exec(query, participant.Name, participant.Surname, participant.BirthDay,
 	participant.Description,participant.Nickname, participant.SummonerName, participant.TwitchChannel, participant.Instagram, participant.Twitter, participant.Youtube)
 	if err != nil {
