@@ -50,7 +50,7 @@ func (c HttpClient) DeleteUsersAllPickems(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	isUserManipulatingHisPickems(string(userId), cookie.Value)
+	err = isUserManipulatingHisPickems(string(userId), cookie.Value)
 	if err != nil {
 		common_http.WriteErrorResponse(w, err)
 		return
