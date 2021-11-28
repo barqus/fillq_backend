@@ -33,16 +33,6 @@ func HandlerAPIv1(router chi.Router) {
 
 	usersClient := users.MustNewHttpClient(users.MustNewService(httpClient, users.MustNewStorage(databaseClient)))
 
-	router.Use(cors.Handler(cors.Options{
-		//AllowedOrigins:   []string{"*"}, // Use this to allow specific origin hosts
-		////AllowedOrigins:   []string{"*"},
-		//// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
-		//AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		//AllowedHeaders:   []string{"X-PINGOTHER","Accept", "Authorization", "Accept-Encoding", "Content-Type", "X-CSRF-Token","X-Requested-With"},
-		//ExposedHeaders:   []string{"Link"},
-		//AllowCredentials: true,
-		//MaxAge:           300, // Maximum value not ignored by any of major browsers
-	}))
 
 
 
@@ -53,6 +43,17 @@ func HandlerAPIv1(router chi.Router) {
 
 	participantsClient := participants.MustNewHttpClient(participants.MustNewService(participants.MustNewStorage(databaseClient)))
 	router.Route("/participants", func(r chi.Router) {
+		router.Use(cors.Handler(cors.Options{
+			AllowedOrigins:   []string{"*"}, // Use this to allow specific origin hosts
+			//AllowedOrigins:   []string{"*"},
+			// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
+			AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+			AllowedHeaders:   []string{"X-PINGOTHER","Accept", "Authorization", "Accept-Encoding", "Content-Type", "X-CSRF-Token","X-Requested-With"},
+			ExposedHeaders:   []string{"Link"},
+			AllowCredentials: true,
+			MaxAge:           300, // Maximum value not ignored by any of major browsers
+		}))
+Í
 		r.Get("/", participantsClient.GetAllParticipants)
 		//r.Get("/", participantsClient.GetAllParticipants)
 		r.With(adminMiddleware).Post("/", participantsClient.AddParticipant)
