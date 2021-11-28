@@ -31,10 +31,6 @@ func HandlerAPIv1(router chi.Router) {
 	httpClient := common_http.NewClient(http.DefaultClient)
 
 	usersClient := users.MustNewHttpClient(users.MustNewService(httpClient, users.MustNewStorage(databaseClient)))
-
-
-
-
 	router.Route("/user", func(r chi.Router) {
 		r.Get("/login/{id}", usersClient.LoginUser)
 		r.Get("/{id}", usersClient.GetUserByID)
@@ -42,7 +38,6 @@ func HandlerAPIv1(router chi.Router) {
 
 	participantsClient := participants.MustNewHttpClient(participants.MustNewService(participants.MustNewStorage(databaseClient)))
 	router.Route("/participants", func(r chi.Router) {
-		r.Options("/",participantsClient.GetAllParticipants)
 		r.Get("/", participantsClient.GetAllParticipants)
 		//r.Get("/", participantsClient.GetAllParticipants)
 		r.With(adminMiddleware).Post("/", participantsClient.AddParticipant)
