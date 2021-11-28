@@ -121,15 +121,14 @@ func (c HttpClient) CreateUsersPickems(w http.ResponseWriter, r *http.Request) {
 func isUserManipulatingHisPickems(userID string, jwtToken string) error{
 	// TODO: TEST THIS OUT
 
-	logrus.Info("HERERERER")
 	jwtTokenInformation, err := mw.VerifyToken(jwtToken)
+	logrus.Info("JWTToen:", jwtTokenInformation)
 	if err != nil {
 		return err
 	}
 
 	jwtTokenMetadata := jwtTokenInformation.Claims.(jwt.MapClaims)
 	authenticatedUserID := jwtTokenMetadata["user_id"].(string)
-	logrus.Info("COOKIE: ", authenticatedUserID)
 	if authenticatedUserID != userID {
 		return config.NOT_YOUR_PICKEMS
 	}
