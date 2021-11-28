@@ -19,7 +19,7 @@ func HandleHTTP() {
 		//AllowedOrigins:   []string{"*"},
 		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Accept-Encoding", "Content-Type", "X-CSRF-Token","X-Requested-With"},
+		AllowedHeaders:   []string{"X-PINGOTHER","Accept", "Authorization", "Accept-Encoding", "Content-Type", "X-CSRF-Token","X-Requested-With"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: true,
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
