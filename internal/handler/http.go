@@ -36,6 +36,6 @@ func HandleHTTP() {
 	l.Info(os.Environ())
 	l.Info("TEST")
 	l.Info("SERVER STARTED...")
-	panic(http.ListenAndServeTLS(":8080","server.crt","server.key", r))
+	panic(http.ListenAndServe(":8080",r))
 
 }
