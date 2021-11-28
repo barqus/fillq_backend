@@ -11,6 +11,7 @@ import (
 	"github.com/barqus/fillq_backend/internal/users"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-chi/chi"
+	"github.com/go-chi/cors"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"os"
@@ -31,6 +32,20 @@ func HandlerAPIv1(router chi.Router) {
 	httpClient := common_http.NewClient(http.DefaultClient)
 
 	usersClient := users.MustNewHttpClient(users.MustNewService(httpClient, users.MustNewStorage(databaseClient)))
+
+	router.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"*"}, // Use this to allow specific origin hosts
+		//AllowedOrigins:   []string{"*"},
+		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"X-PINGOTHER","Accept", "Authorization", "Accept-Encoding", "Content-Type", "X-CSRF-Token","X-Requested-With"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	}))
+
+
+
 	router.Route("/user", func(r chi.Router) {
 		r.Get("/login/{id}", usersClient.LoginUser)
 		r.Get("/{id}", usersClient.GetUserByID)
