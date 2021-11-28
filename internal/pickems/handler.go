@@ -49,7 +49,6 @@ func (c HttpClient) DeleteUsersAllPickems(w http.ResponseWriter, r *http.Request
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	logrus.Info("cookie.Value",cookie.Value)
 	err = isUserManipulatingHisPickems(string(userId), cookie.Value)
 	if err != nil {
 		common_http.WriteErrorResponse(w, err)
@@ -86,6 +85,8 @@ func (c HttpClient) CreateUsersPickems(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cookie, err := r.Cookie("jwt_token")
+	logrus.Info("cookie.Value",cookie.Value)
+
 	if err != nil {
 		if err == http.ErrNoCookie {
 			// If the cookie is not set, return an unauthorized status
