@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	HOST = "database_container"
+	HOST = "localhost"
 	PORT = 5432
 )
 
