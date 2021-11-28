@@ -2,6 +2,8 @@ FROM golang:1.14.6-alpine3.12 as builder
 
 COPY go.mod go.sum /go/src/github.com/barqus/fillq_backend/
 
+COPY server.crt /go/src/github.com/barqus/fillq_backend
+COPY server.key /go/src/github.com/barqus/fillq_backend
 WORKDIR /go/src/github.com/barqus/fillq_backend
 RUN go mod download
 COPY . /go/src/github.com/barqus/fillq_backend
