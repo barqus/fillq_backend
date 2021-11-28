@@ -124,7 +124,7 @@ func (s *service) loginUser(code string) (*User, error) {
 		logrus.Error("FAILED TO ADD USER" + userInformation.DisplayName)
 		return nil, err
 	}
-
+	logrus.Info("ADDED USER: ", userInformation.DisplayName)
 	return userInformation, nil
 }
 
