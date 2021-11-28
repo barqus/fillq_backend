@@ -143,7 +143,7 @@ func generateJWTForUser(userID string) (string, error){
 	atClaims["exp"] = expirationDate
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
 	token, err := at.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
-
+	logrus.Info("HERER",err,token)
 	if err != nil {
 		return "", err
 	}
