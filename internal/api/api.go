@@ -53,7 +53,7 @@ func HandlerAPIv1(router chi.Router) {
 			AllowCredentials: true,
 			MaxAge:           300, // Maximum value not ignored by any of major browsers
 		}))
-Í
+
 		r.Get("/", participantsClient.GetAllParticipants)
 		//r.Get("/", participantsClient.GetAllParticipants)
 		r.With(adminMiddleware).Post("/", participantsClient.AddParticipant)
