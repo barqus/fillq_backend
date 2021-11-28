@@ -5,6 +5,7 @@ import (
 	"github.com/barqus/fillq_backend/internal/common_http"
 	mw "github.com/barqus/fillq_backend/internal/middleware"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
 )
@@ -65,8 +66,6 @@ func (c HttpClient) DeleteUsersAllPickems(w http.ResponseWriter, r *http.Request
 }
 
 func (c HttpClient) CreateUsersPickems(w http.ResponseWriter, r *http.Request) {
-	// TODO: CHECK IF THIS IS WORKING:
-	// TODO: ADD DELETE IF CALLED SECOND TIME
 	currentDate := time.Now()
 	location, err := time.LoadLocation("EET")
 	if err != nil {
@@ -87,6 +86,7 @@ func (c HttpClient) CreateUsersPickems(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cookie, err := r.Cookie("jwt_token")
+	logrus.Info("COOKIE: ", cookie)
 	if err != nil {
 		if err == http.ErrNoCookie {
 			// If the cookie is not set, return an unauthorized status
@@ -125,8 +125,10 @@ func isUserManipulatingHisPickems(userID string, jwtToken string) error{
 	if err != nil {
 		return err
 	}
+
 	jwtTokenMetadata := jwtTokenInformation.Claims.(jwt.MapClaims)
 	authenticatedUserID := jwtTokenMetadata["user_id"].(string)
+	logrus.Info("COOKIE: ", authenticatedUserID)
 	if authenticatedUserID != userID {
 		return config.NOT_YOUR_PICKEMS
 	}
