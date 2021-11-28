@@ -75,6 +75,8 @@ func (r *client) doRequest(ctx context.Context, method, address, token string, p
 func WriteJSONResponse(w http.ResponseWriter, statusCode int, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers","Content-Type,access-control-allow-origin, access-control-allow-headers")
+
 	w.WriteHeader(statusCode)
 
 	if data != nil {
@@ -91,6 +93,7 @@ func WriteErrorResponse(w http.ResponseWriter, errorMessage error) {
 	if ok {
 		code = http.HTTPCode()
 	}
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Add("error_code", errorMessage.Error())
 	WriteJSONResponse(w, code, &HttpError{
 		Message: errorMessage.Error(),
