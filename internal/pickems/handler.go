@@ -49,7 +49,7 @@ func (c HttpClient) DeleteUsersAllPickems(w http.ResponseWriter, r *http.Request
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
+	logrus.Info("cookie.Value",cookie.Value)
 	err = isUserManipulatingHisPickems(string(userId), cookie.Value)
 	if err != nil {
 		common_http.WriteErrorResponse(w, err)
