@@ -14,14 +14,14 @@ func HandleHTTP() {
 
 	// Basic CORS
 	// for more ideas, see: https://developer.github.com/v3/#cross-origin-resource-sharing
-	r.Use(cors.Handler(cors.Options{
-		AllowOriginFunc:  AllowOriginFunc,
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+	cors := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: true,
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
-	}))
+	})
+	r.Use(cors.Handler)
 
 	l := logrus.New()
 
@@ -36,8 +36,4 @@ func HandleHTTP() {
 	l.Info("SERVER STARTED...")
 	panic(http.ListenAndServe(":8080",r))
 
-}
-
-func AllowOriginFunc(r *http.Request, origin string) bool {
-	return true
 }
