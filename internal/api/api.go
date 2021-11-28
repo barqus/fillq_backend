@@ -37,7 +37,7 @@ func HandlerAPIv1(router chi.Router) {
 		AllowedOrigins:   []string{"*"}, // Use this to allow specific origin hosts
 		//AllowedOrigins:   []string{"*"},
 		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
 		AllowedHeaders:   []string{"X-PINGOTHER","Accept", "Authorization", "Accept-Encoding", "Content-Type", "X-CSRF-Token","X-Requested-With"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: true,
