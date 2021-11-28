@@ -120,9 +120,9 @@ func (c HttpClient) CreateUsersPickems(w http.ResponseWriter, r *http.Request) {
 
 func isUserManipulatingHisPickems(userID string, jwtToken string) error{
 	// TODO: TEST THIS OUT
-
+	logrus.Info("jwtToken:", jwtToken)
 	jwtTokenInformation, err := mw.VerifyToken(jwtToken)
-	logrus.Info("JWTToen:", jwtTokenInformation)
+
 	if err != nil {
 		return err
 	}

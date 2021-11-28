@@ -3,6 +3,7 @@ package middleware
 import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/sirupsen/logrus"
 	"os"
 )
 
@@ -14,6 +15,8 @@ func VerifyToken(jwtToken string) (*jwt.Token, error) {
 		}
 		return []byte(os.Getenv("ACCESS_SECRET")), nil
 	})
+
+	logrus.Info("jwtTokeneerr:", err)
 	if err != nil {
 		return nil, err
 	}
