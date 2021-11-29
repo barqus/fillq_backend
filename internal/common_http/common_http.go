@@ -25,8 +25,8 @@ type client struct {
 }
 
 type HttpError struct {
-	Message string `json:"message"`
-	ErrorCode int `json:"error_code"`
+	Message   string `json:"message"`
+	ErrorCode int    `json:"error_code"`
 }
 
 func NewClient(httpClient *http.Client) Client {
@@ -88,6 +88,10 @@ func WriteJSONResponse(w http.ResponseWriter, statusCode int, data interface{}) 
 }
 
 func WriteErrorResponse(w http.ResponseWriter, errorMessage error) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	// w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	code := http.StatusInternalServerError
 	http, ok := errorMessage.(*config.ErrorHttp)
 	if ok {
@@ -95,7 +99,7 @@ func WriteErrorResponse(w http.ResponseWriter, errorMessage error) {
 	}
 	w.Header().Add("error_code", errorMessage.Error())
 	WriteJSONResponse(w, code, &HttpError{
-		Message: errorMessage.Error(),
+		Message:   errorMessage.Error(),
 		ErrorCode: code,
 	})
 }

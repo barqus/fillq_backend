@@ -2,10 +2,10 @@ package main
 
 import (
 	"github.com/barqus/fillq_backend/cmd"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	//httpClient := common_http.NewClient(http.DefaultClient)
-	//youtube.MustNewService(httpClient).GetChannelsVideos()
+	godotenv.Load(".env")
 	cmd.Execute()
 }

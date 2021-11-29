@@ -29,16 +29,17 @@ func (c HttpClient) LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	expireDate := time.Now().AddDate(0,0,30)
+	expireDate := time.Now().AddDate(0, 0, 30)
 	http.SetCookie(w, &http.Cookie{
-		Name: "jwt_token",
-		Value: loggedUser.JWTToken,
-		Path: "/",
-		Expires: expireDate,
+		Name:     "jwt_token",
+		Value:    loggedUser.JWTToken,
+		Path:     "/",
+		Expires:  expireDate,
+		SameSite: http.SameSiteNoneMode,
+		Secure:   true,
 	})
 	common_http.WriteJSONResponse(w, http.StatusOK, &loggedUser.ID)
 }
-
 
 func (c HttpClient) GetUserByID(w http.ResponseWriter, r *http.Request) {
 	id, err := common_http.ParseURLParamToString(r, "id")
