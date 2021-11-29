@@ -39,7 +39,6 @@ func HandlerAPIv1(router chi.Router) {
 	participantsClient := participants.MustNewHttpClient(participants.MustNewService(participants.MustNewStorage(databaseClient)))
 	router.Route("/participants", func(r chi.Router) {
 		r.Get("/", participantsClient.GetAllParticipants)
-		//r.Get("/", participantsClient.GetAllParticipants)
 		r.With(adminMiddleware).Post("/", participantsClient.AddParticipant)
 		r.With(adminMiddleware).Delete("/{id}", participantsClient.DeleteParticipant)
 	})
@@ -48,13 +47,8 @@ func HandlerAPIv1(router chi.Router) {
 	router.Route("/pickems", func(r chi.Router) {
 		r.Get("/{user_id}", pickemsClient.GetUsersPickems)
 		r.Post("/{user_id}", pickemsClient.CreateUsersPickems)
-		r.Delete(	"/{user_id}", pickemsClient.DeleteUsersAllPickems)
+		r.Delete("/{user_id}", pickemsClient.DeleteUsersAllPickems)
 	})
-
-	//summonersClient := leagueoflegends.MustNewHttpClient()
-	//router.Route("/summoners", func(r chi.Router) {
-	//	r.Get("/", summonersClient.GetLeagueInformation)
-	//})
 
 	qnaClient := questions.MustNewHttpClient(questions.MustNewService(questions.MustNewStorage(databaseClient)))
 	router.Route("/questions", func(r chi.Router) {
@@ -93,6 +87,6 @@ func adminMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		next.ServeHTTP(w,r)
+		next.ServeHTTP(w, r)
 	})
 }

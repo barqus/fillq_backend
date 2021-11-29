@@ -1,0 +1,2 @@
+runtime: go116  # or another supported version
+entrypoint: go run main.go server

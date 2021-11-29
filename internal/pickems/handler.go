@@ -7,6 +7,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -49,7 +50,7 @@ func (c HttpClient) DeleteUsersAllPickems(w http.ResponseWriter, r *http.Request
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	err = isUserManipulatingHisPickems(string(userId), cookie.Value)
+	err = isUserManipulatingHisPickems(userId, cookie.Value)
 	if err != nil {
 		common_http.WriteErrorResponse(w, err)
 		return
@@ -85,7 +86,7 @@ func (c HttpClient) CreateUsersPickems(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cookie, err := r.Cookie("jwt_token")
-	logrus.Info("cookie.Value",cookie.Value)
+	logrus.Info("user_id", id)
 
 	if err != nil {
 		if err == http.ErrNoCookie {
@@ -98,8 +99,9 @@ func (c HttpClient) CreateUsersPickems(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = isUserManipulatingHisPickems(string(id), cookie.Value)
+	err = isUserManipulatingHisPickems(id, cookie.Value)
 	if err != nil {
+
 		common_http.WriteErrorResponse(w, err)
 		return
 	}
@@ -109,7 +111,7 @@ func (c HttpClient) CreateUsersPickems(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = c.svc.createUsersPickems(pickemData,id)
+	err = c.svc.createUsersPickems(pickemData, id)
 	if err != nil {
 		common_http.WriteErrorResponse(w, err)
 		return
@@ -118,8 +120,7 @@ func (c HttpClient) CreateUsersPickems(w http.ResponseWriter, r *http.Request) {
 	common_http.WriteJSONResponse(w, http.StatusOK, 200)
 }
 
-
-func isUserManipulatingHisPickems(userID string, jwtToken string) error{
+func isUserManipulatingHisPickems(userID int, jwtToken string) error {
 	// TODO: TEST THIS OUT
 	logrus.Info("jwtToken:", jwtToken)
 	jwtTokenInformation, err := mw.VerifyToken(jwtToken)
@@ -130,7 +131,10 @@ func isUserManipulatingHisPickems(userID string, jwtToken string) error{
 
 	jwtTokenMetadata := jwtTokenInformation.Claims.(jwt.MapClaims)
 	authenticatedUserID := jwtTokenMetadata["user_id"].(string)
-	if authenticatedUserID != userID {
+
+	intOfAuth, _ := strconv.Atoi(authenticatedUserID)
+	logrus.Info("NOT YOUR", intOfAuth, " = ", userID)
+	if intOfAuth != userID {
 		return config.NOT_YOUR_PICKEMS
 	}
 	return nil

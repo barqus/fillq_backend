@@ -18,22 +18,15 @@ import (
 func UpdateSummonersInformation(databaseClient *database.Database, client *golio.Client) {
 	participantsStorage := participants.MustNewStorage(databaseClient)
 	lolStorage := MustNewStorage(databaseClient)
-	fmt.Println("TRIGGERED UPDATE")
 	allParticipants, err := participantsStorage.GetAllParticipants()
 	if err != nil {
-		fmt.Println("HERE")
 		fmt.Println(err.Error())
-
 	}
 	for _, item := range allParticipants {
+		fmt.Println("UPDATING: ", item.Nickname)
 		summoner, err := client.Riot.LoL.Summoner.GetByName(item.SummonerName)
 		if err != nil {
-			// TODO: ADD ERORR HERE
-			//common_http.WriteErrorResponse(w, err)
-			//common_http.WriteJSONResponse(w, http.StatusOK, allSummoners)
-			fmt.Println("HERE2")
 			fmt.Println(err.Error())
-			fmt.Println(item.SummonerName)
 			continue
 		}
 
@@ -56,7 +49,6 @@ func UpdateSummonersInformation(databaseClient *database.Database, client *golio
 				summonerLeagueFound = true
 				summonerExists, err := lolStorage.summonerAlreadyExists(currentParticipantsSummonerLeague.PUUID)
 				if err != nil {
-					fmt.Println("HERE3")
 					fmt.Println(err)
 					continue
 				}
@@ -64,14 +56,12 @@ func UpdateSummonersInformation(databaseClient *database.Database, client *golio
 				if *summonerExists == true {
 					err = lolStorage.UpdateSummonerLeagueByID(currentParticipantsSummonerLeague, summoner.PUUID)
 					if err != nil {
-						fmt.Println("HERE4")
 						fmt.Println(err)
 						continue
 					}
 				} else {
 					err = lolStorage.AddSummonerLeague(currentParticipantsSummonerLeague)
 					if err != nil {
-						fmt.Println("HERE5")
 						fmt.Println(err)
 						continue
 					}
@@ -133,7 +123,6 @@ func GetSummonersMatchHistory(client *golio.Client, PUUID string) (int, int, err
 	queue := 420
 	matchListOptions := lol.MatchListOptions{Queue: &queue}
 	arrayOfMatches, _ := client.Riot.LoL.Match.List(PUUID, 0, 10, &matchListOptions)
-	// TODO: ERROR CATCHING
 	wins := 0
 	losses := 0
 	for _, item := range arrayOfMatches {
@@ -150,92 +139,4 @@ func GetSummonersMatchHistory(client *golio.Client, PUUID string) (int, int, err
 	}
 
 	return wins, losses, nil
-}
-func getLeagueInformationBySummonerName() {
-	// TODO: REDO THIS SO IT IS CALLED AS SCHEDULED TASK
-	//vars := mux.Vars(r)
-	//summonerName := vars["summoner_name"]
-
-	apiKey := os.Getenv("RIOT_GAMES_API_KEY")
-	client := golio.NewClient(apiKey, golio.WithRegion(api.RegionEuropeWest))
-
-	//summoners := [12]string{"Fill to Heaven", "Lenkijos Princas", "Old Man Raizzo", "57864393", "jaunutis1111", "elosanta fill", "DNA Domas", "Piridacas V2", "Gurklys FILLQ", "PoveikioKaralius", "urbis šliurbis"}
-	summoners := [1]string{"saulius1"}
-
-	allSummoners := make([]*lol.Summoner, 0)
-	for _, item := range summoners {
-		summoner, err := client.Riot.LoL.Summoner.GetByName(item)
-		if err != nil {
-			//common_http.WriteErrorResponse(w, err)
-			//common_http.WriteJSONResponse(w, http.StatusOK, allSummoners)
-
-			return
-		}
-		//SummonersLeagueInformation, err := client.Riot.LoL.League.ListBySummoner(summoner.ID)
-		//common_http.WriteJSONResponse(w, http.StatusOK, SummonersLeagueInformation)
-
-		allSummoners = append(allSummoners, summoner)
-		fmt.Println(summoner)
-	}
-
-	// /lol/match/v5/matches/by-puuid/{puuid}/ids?queue=420&start=0&count=11
-	queue := 420
-	matchListOptions := lol.MatchListOptions{Queue: &queue}
-	arrayOfMatches, _ := client.Riot.LoL.Match.List(allSummoners[0].PUUID, 0, 10, &matchListOptions)
-	tmp := make([]*lol.Match, 0)
-	for _, item := range arrayOfMatches {
-		matchInfo, _ := client.Riot.LoL.Match.Get(item)
-		tmp = append(tmp, matchInfo)
-	}
-	fmt.Println(tmp)
-	//common_http.WriteJSONResponse(w, http.StatusOK, tmp)
-
-	//if err != nil {
-	//	http.Error(w, err.Error(), http.StatusBadRequest)
-	//	return
-	//}
-	//
-	//SummonersLeagueInformation, err := client.Riot.LoL.League.ListBySummoner(summoner.ID)
-	//if err != nil {
-	//	http.Error(w, err.Error(), http.StatusBadRequest)
-	//	return
-	//}
-	//
-	//w.Header().Add("Content-Type", "application/json")
-	//w.WriteHeader(http.StatusOK)
-	//json.NewEncoder(w).Encode(SummonersLeagueInformation)
-}
-
-func GetParticipantsMatchInfo(summonerId string) {
-	apiKey := "RGAPI-d7047eaa-db5e-47a7-867f-8b860b6b441f"
-	client := golio.NewClient(apiKey, golio.WithRegion(api.RegionEuropeWest))
-	//summoner, _ := client.Riot.Summoner.GetByID(summonerId)
-	summoner, _ := client.Riot.Summoner.GetByName(summonerId)
-	//fmt.Printf("Accoun id: %s \n", summoner.RevisionDate)
-	//matchList, err := client.Riot.LoL.Spectator.GetCurrent(summoner.ID)
-
-	// grazina lygos informacija wins loses etc.
-	//test, _ := client.Riot.LoL.League.ListBySummoner(summoner.ID)
-
-	c := client.Riot.LoL.Match.ListStream(summoner.AccountID)
-
-	output := <-c
-
-	fmt.Print(output)
-	//err := nill
-	//if err != nil {
-	//	fmt.Printf("ERROR")
-	//	//fmt.Printf(err.Error())
-	//}
-
-	//fmt.Print(matchList)
-	fmt.Printf("%s is a level %d summoner\n", summoner.Name, summoner.SummonerLevel)
-	//champion, _ := client.DataDragon.GetChampion("Ashe")
-	//mastery, err := client.Riot.ChampionMastery.Get(summoner.ID, champion.Key)
-	//if err != nil {
-	//	fmt.Printf("%s has not played any games on %s\n", summoner.Name, champion.Name)
-	//} else {
-	//	fmt.Printf("%s has mastery level %d with %d points on %s\n", summoner.Name, mastery.ChampionLevel,
-	//		mastery.ChampionPoints, champion.Name)
-	//}
 }
