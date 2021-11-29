@@ -16,6 +16,7 @@ import (
 // TODO: atsimint kad riot games api limitina requestus turbut reikia daryt scheduleri kuris callins del informacijos
 // TODO: update rows instead of add
 func UpdateSummonersInformation(databaseClient *database.Database, client *golio.Client) {
+	callAmount := 0
 	participantsStorage := participants.MustNewStorage(databaseClient)
 	lolStorage := MustNewStorage(databaseClient)
 	allParticipants, err := participantsStorage.GetAllParticipants()
@@ -25,12 +26,21 @@ func UpdateSummonersInformation(databaseClient *database.Database, client *golio
 	for _, item := range allParticipants {
 		fmt.Println("UPDATING: ", item.Nickname)
 		summoner, err := client.Riot.LoL.Summoner.GetByName(item.SummonerName)
+		callAmount++
+
+		fmt.Println("CALL AMOUNT:", callAmount)
 		if err != nil {
-			fmt.Println(err.Error())
+			fmt.Println("ERR", err)
 			continue
 		}
 
 		summonersLeagueInformation, err := client.Riot.LoL.League.ListBySummoner(summoner.ID)
+		if err != nil {
+			fmt.Println("ERR", err)
+			continue
+		}
+		callAmount++
+		fmt.Println("CALL AMOUNT:", callAmount)
 		//summonersLeagueInformation
 		summonerLeagueFound := false
 		for _, leagueItem := range summonersLeagueInformation {
@@ -74,7 +84,7 @@ func UpdateSummonersInformation(databaseClient *database.Database, client *golio
 			continue
 		}
 
-		wins, loses, err := GetSummonersMatchHistory(client, summoner.PUUID)
+		wins, loses, err := GetSummonersMatchHistory(client, summoner.PUUID,&callAmount)
 		currentParticipantsSummonerLeague := SummonerLeague{
 			PUUID:         summoner.PUUID,
 			SummonerName:  summoner.Name,
@@ -109,6 +119,7 @@ func UpdateSummonersInformation(databaseClient *database.Database, client *golio
 			}
 		}
 	}
+
 }
 
 func SetupRiotClient() *golio.Client {
@@ -119,14 +130,26 @@ func SetupRiotClient() *golio.Client {
 	return client
 }
 
-func GetSummonersMatchHistory(client *golio.Client, PUUID string) (int, int, error) {
+func GetSummonersMatchHistory(client *golio.Client, PUUID string, callAmount *int) (int, int, error) {
 	queue := 420
 	matchListOptions := lol.MatchListOptions{Queue: &queue}
-	arrayOfMatches, _ := client.Riot.LoL.Match.List(PUUID, 0, 10, &matchListOptions)
+	*callAmount++
+	fmt.Println("CALL AMOUNT:", *callAmount)
+	arrayOfMatches, err := client.Riot.LoL.Match.List(PUUID, 0, 10, &matchListOptions)
+	if err != nil {
+		fmt.Println("ERR", err)
+		return 0, 0, err
+	}
 	wins := 0
 	losses := 0
 	for _, item := range arrayOfMatches {
-		matchesInfo, _ := client.Riot.LoL.Match.Get(item)
+		*callAmount++
+		fmt.Println("CALL AMOUNT:", *callAmount)
+		matchesInfo, err := client.Riot.LoL.Match.Get(item)
+		if err != nil {
+			fmt.Println("ERR", err)
+			continue
+		}
 		for _, matchParticipant := range matchesInfo.Info.Participants {
 			if matchParticipant.PUUID == PUUID {
 				if matchParticipant.Win == true {
