@@ -17,8 +17,6 @@ import (
 )
 
 func HandlerAPIv1(router chi.Router) {
-	// TODO: READ ENV VARIABLES THROUGH .ENV FILE
-
 	l := logrus.New()
 
 	l.SetFormatter(&logrus.JSONFormatter{})

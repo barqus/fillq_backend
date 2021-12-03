@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/barqus/fillq_backend/config"
 	"github.com/barqus/fillq_backend/internal/common_http"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/sirupsen/logrus"
-	"os"
-	"time"
 )
 
 type Service interface {
@@ -101,9 +102,9 @@ func (s *service) loginUser(code string) (*User, error) {
 		Email:           twitchChannelInfo.Email,
 		TwitchCode:      code,
 		Role:            "regular",
-		AccessToken: responseObject.AccessToken,
-		RefreshToken: responseObject.RefreshToken,
-		JWTToken: jwtToken,
+		AccessToken:     responseObject.AccessToken,
+		RefreshToken:    responseObject.RefreshToken,
+		JWTToken:        jwtToken,
 	}
 
 	existingUser, err = s.storage.getUserByID(userInformation.ID)
@@ -128,7 +129,7 @@ func (s *service) loginUser(code string) (*User, error) {
 	return userInformation, nil
 }
 
-func generateJWTForUser(userID string) (string, error){
+func generateJWTForUser(userID string) (string, error) {
 	var err error
 	atClaims := jwt.MapClaims{}
 	if userID == "107170813" {
@@ -138,12 +139,12 @@ func generateJWTForUser(userID string) (string, error){
 	}
 
 	atClaims["user_id"] = userID
-	expirationDate := time.Now().AddDate(0,1,0)
+	expirationDate := time.Now().AddDate(0, 1, 0)
 	fmt.Println(expirationDate)
 	atClaims["exp"] = expirationDate
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
 	token, err := at.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
-	logrus.Info("HERER",err,token)
+	logrus.Info("HERER", err, token)
 	if err != nil {
 		return "", err
 	}

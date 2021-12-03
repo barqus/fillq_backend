@@ -22,7 +22,6 @@ func MustNewStorage(db *database.Database) Storage {
 	}
 }
 
-// TODO: KAS BUNA JEI SUZAIDZIA ZAIDIMA?
 func (lol leagueoflegendsStorage) AddSummonerLeague(summoner SummonerLeague) error {
 	query := `INSERT INTO summoners (puuid, summoner_name, tier, rank, points, wins, losses, participant_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
@@ -50,7 +49,6 @@ func (lol leagueoflegendsStorage) summonerAlreadyExists(PUUID string) (*bool, er
 	}
 }
 
-// TODO: KAS BUNA JEI NULL WINS
 func (lol leagueoflegendsStorage) UpdateSummonerLeagueByID(summoner SummonerLeague, summonerID string) error {
 	query := `UPDATE summoners SET tier=$1, rank=$2, points=$3, wins=$4, losses=$5 WHERE puuid=$6`
 

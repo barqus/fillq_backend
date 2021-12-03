@@ -5,4 +5,5 @@ type PickEm struct {
 	UserID        int    `json:"user_id"`
 	ParticipantID int    `json:"participant_id"`
 	Position      int    `json:"position"`
+
 }

@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+
 	_ "github.com/lib/pq"
 )
 
@@ -19,7 +20,6 @@ type Database struct {
 }
 
 func Initialize(username, password, database string) (*Database, error) {
-	// TODO: CHECK WHAT VARIABLES ARE RUN WITH MIGRATION
 	// export POSTGRESQL_URL=""
 	// migrate -database ${POSTGRESQL_URL} -path ./migrations upv
 	db := Database{}
@@ -32,7 +32,7 @@ func Initialize(username, password, database string) (*Database, error) {
 		HOST,
 		PORT,
 		"postgres")
-
+	fmt.Println(dsn)
 	conn, err := sql.Open("postgres", dsn)
 	if err != nil {
 		return &db, err

@@ -72,7 +72,7 @@ func (c HttpClient) CreateUsersPickems(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	closingDate := time.Date(2021, 12, 04, 12, 0, 0, 0, location)
+	closingDate := time.Date(2021, 12, 05, 23, 59, 59, 0, location)
 	if currentDate.After(closingDate) == true {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -121,7 +121,6 @@ func (c HttpClient) CreateUsersPickems(w http.ResponseWriter, r *http.Request) {
 }
 
 func isUserManipulatingHisPickems(userID int, jwtToken string) error {
-	// TODO: TEST THIS OUT
 	logrus.Info("jwtToken:", jwtToken)
 	jwtTokenInformation, err := mw.VerifyToken(jwtToken)
 

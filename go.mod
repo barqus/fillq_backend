@@ -30,8 +30,8 @@ require (
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
-	github.com/jasonlvhit/gocron v0.0.1 // indirect
-	github.com/joho/godotenv v1.4.0 // indirect
+	github.com/jasonlvhit/gocron v0.0.1
+	github.com/joho/godotenv v1.4.0
 	github.com/json-iterator/go v1.1.11 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.1 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect

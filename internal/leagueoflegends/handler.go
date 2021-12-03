@@ -13,8 +13,6 @@ import (
 	"os"
 )
 
-// TODO: atsimint kad riot games api limitina requestus turbut reikia daryt scheduleri kuris callins del informacijos
-// TODO: update rows instead of add
 func UpdateSummonersInformation(databaseClient *database.Database, client *golio.Client) {
 	callAmount := 0
 	participantsStorage := participants.MustNewStorage(databaseClient)
